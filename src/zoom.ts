@@ -6,6 +6,9 @@
  * 2. Activates on double finger (not single touch)
  */
 
+type vector = [number, number];
+type matrix = [vector, vector];
+
 interface Config {
 	rotate: boolean;
 	pan: boolean;
@@ -14,74 +17,65 @@ interface Config {
 }
 
 // Scalar multiplication
-const scalarMultiply = (
-	scalar: number,
-	vector: [number, number]
-): [number, number] => [scalar * vector[0], scalar * vector[1]];
+const scalarMultiply = (scalar: number, vector: vector): vector => [
+	scalar * vector[0],
+	scalar * vector[1],
+];
 
 // Vector addition
-const vectorAddition = (
-	a: [number, number],
-	b: [number, number]
-): [number, number] => [a[0] + b[0], a[1] + b[1]];
+const vectorAddition = (a: vector, b: vector): vector => [
+	a[0] + b[0],
+	a[1] + b[1],
+];
 
 // Vector subtraction
-const vectorSubtraction = (
-	a: [number, number],
-	b: [number, number]
-): [number, number] => [a[0] - b[0], a[1] - b[1]];
+const vectorSubtraction = (a: vector, b: vector): vector => [
+	a[0] - b[0],
+	a[1] - b[1],
+];
 
 // Dot product of two vectors
-const dotProduct = (a: [number, number], b: [number, number]): number =>
-	a[0] * b[0] + a[1] * b[1];
+const dotProduct = (a: vector, b: vector): number => a[0] * b[0] + a[1] * b[1];
 
 // Wedge product of two vectors
-const wedgeProduct = (a: [number, number], b: [number, number]): number =>
+const wedgeProduct = (a: vector, b: vector): number =>
 	a[0] * b[1] - a[1] * b[0];
 
 // Apply transformation matrix to vector
-const applyTransformation = (
-	matrix: [[number, number], [number, number]],
-	vector: [number, number]
-): [number, number] =>
+const applyTransformation = (matrix: matrix, vector: vector): vector =>
 	vectorAddition(
 		scalarMultiply(vector[0], matrix[0]),
 		scalarMultiply(vector[1], matrix[1])
 	);
 
 // Matrix multiplication
-const matrixMultiply = (
-	A: [[number, number], [number, number]],
-	B: [[number, number], [number, number]]
-): [[number, number], [number, number]] => [
+const matrixMultiply = (A: matrix, B: matrix): [vector, vector] => [
 	applyTransformation(A, B[0]),
 	applyTransformation(A, B[1]),
 ];
 
 class Transform {
-	A: [[number, number], [number, number]];
-	b: [number, number];
+	zoomMatrix: matrix;
+	panVector: vector;
 
-	constructor(
-		matrix: [[number, number], [number, number]],
-		vector: [number, number]
-	) {
-		this.A = matrix;
-		this.b = vector;
+	constructor(zoomMatrix: matrix, panVector: vector) {
+		this.zoomMatrix = zoomMatrix;
+		this.panVector = panVector;
 	}
 
 	// Get CSS transform string representation
 	css(): string {
-		const A = this.A;
-		const b = this.b;
-		return `matrix(${A[0][0]}, ${A[0][1]}, ${A[1][0]}, ${A[1][1]}, ${b[0]}, ${b[1]})`;
+		const zoomMatrix = this.zoomMatrix;
+		const panVector = this.panVector;
+
+		return `matrix(${zoomMatrix[0][0]}, ${zoomMatrix[0][1]}, ${zoomMatrix[1][0]}, ${zoomMatrix[1][1]}, ${panVector[0]}, ${panVector[1]})`;
 	}
 
 	// Average transformation matrices and vectors
 	static average(Z: Transform, I: Transform, progress: number): Transform {
 		return new Transform(
-			averageMatrix(Z.A, I.A, progress),
-			averageVector(Z.b, I.b, progress)
+			averageMatrix(Z.zoomMatrix, I.zoomMatrix, progress),
+			averageVector(Z.panVector, I.panVector, progress)
 		);
 	}
 }
@@ -89,24 +83,18 @@ class Transform {
 // Cascade two transformations
 const cascadeTransformations = (T: Transform, U: Transform): Transform =>
 	new Transform(
-		matrixMultiply(T.A, U.A),
-		vectorAddition(applyTransformation(T.A, U.b), T.b)
+		matrixMultiply(T.zoomMatrix, U.zoomMatrix),
+		vectorAddition(applyTransformation(T.zoomMatrix, U.panVector), T.panVector)
 	);
 
 // Rotate transformation matrix
-const rotateMatrix = (
-	cosTheta: number,
-	sinTheta: number
-): [[number, number], [number, number]] => [
+const rotateMatrix = (cosTheta: number, sinTheta: number): matrix => [
 	[cosTheta, sinTheta],
 	[-sinTheta, cosTheta],
 ];
 
 // Get rotation and scaling transformation matrix
-const rotationScalingMatrix = (
-	a: [number, number],
-	b: [number, number]
-): [[number, number], [number, number]] => {
+const rotationScalingMatrix = (a: vector, b: vector): matrix => {
 	const aLength = dotProduct(a, a);
 	const dotProductAB = dotProduct(a, b);
 	const wedgeProductAB = wedgeProduct(a, b);
@@ -114,10 +102,7 @@ const rotationScalingMatrix = (
 };
 
 // Get scaling transformation matrix
-const justScalingMatrix = (
-	a: [number, number],
-	b: [number, number]
-): [[number, number], [number, number]] => {
+const justScalingMatrix = (a: vector, b: vector): matrix => {
 	const aLength = Math.sqrt(dotProduct(a, a));
 	const bLength = Math.sqrt(dotProduct(b, b));
 	const scale = bLength / aLength;
@@ -125,23 +110,19 @@ const justScalingMatrix = (
 };
 
 // Get magnification factor of transformation matrix
-const getMagnification = (
-	matrix: [[number, number], [number, number]]
-): number => Math.abs((matrix[0][0] + matrix[1][1]) / 2);
+const getMagnification = (matrix: matrix): number =>
+	Math.abs((matrix[0][0] + matrix[1][1]) / 2);
 
 // Scale transformation matrix by a scalar factor
-const scaleMatrix = (
-	matrix: [[number, number], [number, number]],
-	scalar: number
-): [[number, number], [number, number]] => [
+const scaleMatrix = (matrix: matrix, scalar: number): matrix => [
 	scalarMultiply(scalar, matrix[0]),
 	scalarMultiply(scalar, matrix[1]),
 ];
 
 // Zoom transformation between source and destination points
 const zoomTransformation = (
-	source: [[number, number], [number, number]],
-	destination: [[number, number], [number, number]],
+	source: matrix,
+	destination: matrix,
 	allowRotation: boolean,
 	minZoom: number,
 	maxZoom: number
@@ -175,24 +156,16 @@ const zoomTransformation = (
 };
 
 // Average two vectors
-const averageVector = (
-	u: [number, number],
-	v: [number, number],
-	progress: number
-): [number, number] => {
-	const scaledU = scalarMultiply(1 - progress, u);
-	const scaledV = scalarMultiply(progress, v);
+const averageVector = (v1: vector, v2: vector, progress: number): vector => {
+	const scaledU = scalarMultiply(1 - progress, v1);
+	const scaledV = scalarMultiply(progress, v2);
 	return vectorAddition(scaledU, scaledV);
 };
 
 // Average two matrices
-const averageMatrix = (
-	A: [[number, number], [number, number]],
-	B: [[number, number], [number, number]],
-	progress: number
-): [[number, number], [number, number]] => [
-	averageVector(A[0], B[0], progress),
-	averageVector(A[1], B[1], progress),
+const averageMatrix = (m1: matrix, m2: matrix, progress: number): matrix => [
+	averageVector(m1[0], m2[0], progress),
+	averageVector(m1[1], m2[1], progress),
 ];
 
 export class Zoom {
@@ -215,11 +188,11 @@ export class Zoom {
 		],
 		[0, 0]
 	);
-	srcCoords: [[number, number], [number, number]] = [
+	srcCoords: matrix = [
 		[0, 0],
 		[0, 0],
 	];
-	destCoords: [[number, number], [number, number]] = [
+	destCoords: matrix = [
 		[0, 0],
 		[0, 0],
 	];
@@ -264,7 +237,7 @@ export class Zoom {
 	}
 
 	previewZoom(): void {
-		const zoomLevel = getMagnification(this.activeZoom.A);
+		const zoomLevel = getMagnification(this.activeZoom.zoomMatrix);
 		const minZoom = this.config.minZoom / zoomLevel;
 		const maxZoom = this.config.maxZoom / zoomLevel;
 
@@ -356,7 +329,7 @@ export class Zoom {
 				return;
 			}
 			const touches = evt.touches;
-			if (!touches || touches.length < 2) {
+			if (false && !touches || touches.length < 2) {
 				this.mayBeDoubleTap = null;
 				this.isAnimationRunning = false;
 				this.curTouch = 0;
@@ -411,7 +384,7 @@ export class Zoom {
 		this.destCoords = this.getCoords(touches);
 	}
 
-	getCoordsDouble(t: TouchList): [[number, number], [number, number]] {
+	getCoordsDouble(t: TouchList): matrix {
 		const parent = this.elem.parentElement;
 		const rect = parent!.getBoundingClientRect();
 		const offsetX = rect.left;
@@ -422,7 +395,7 @@ export class Zoom {
 		];
 	}
 
-	getCoordsSingle(t: TouchList): [[number, number], [number, number]] {
+	getCoordsSingle(t: TouchList): matrix {
 		const parent = this.elem.parentElement;
 		const rect = parent!.getBoundingClientRect();
 		const offsetX = rect.left;
@@ -435,7 +408,7 @@ export class Zoom {
 		];
 	}
 
-	getCoords(t: TouchList): [[number, number], [number, number]] {
+	getCoords(t: TouchList): matrix {
 		return t.length > 1 ? this.getCoordsDouble(t) : this.getCoordsSingle(t);
 	}
 
