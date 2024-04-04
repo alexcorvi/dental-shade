@@ -68,6 +68,7 @@ class Transform {
 		const zoomMatrix = this.zoomMatrix;
 		const panVector = this.panVector;
 		if (zoomMatrix[0][0] === 1 && zoomMatrix[1][1] === 1) {
+            // reset pan on full zoom-out
 			panVector[0] = 0;
 			panVector[1] = 0;
 		}
