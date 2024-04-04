@@ -141,5 +141,6 @@
 		display: block;
 		margin: 0 auto;
 		border-radius: 5px;
+		transition: transform 0.1s;
 	}
 </style>
