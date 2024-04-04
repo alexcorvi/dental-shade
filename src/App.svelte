@@ -19,6 +19,7 @@
 			new Zoom(canvas, {
 				rotate: false,
 				pan: false,
+				minZoom: 1,
 			});
 
 			start();

@@ -67,7 +67,10 @@ class Transform {
 	css(): string {
 		const zoomMatrix = this.zoomMatrix;
 		const panVector = this.panVector;
-
+		if (zoomMatrix[0][0] === 1 && zoomMatrix[1][1] === 1) {
+			panVector[0] = 0;
+			panVector[1] = 0;
+		}
 		return `matrix(${zoomMatrix[0][0]}, ${zoomMatrix[0][1]}, ${zoomMatrix[1][0]}, ${zoomMatrix[1][1]}, ${panVector[0]}, ${panVector[1]})`;
 	}
 
@@ -329,7 +332,7 @@ export class Zoom {
 				return;
 			}
 			const touches = evt.touches;
-			if (false && !touches || touches.length < 2) {
+			if (!touches || touches.length < 2) {
 				this.mayBeDoubleTap = null;
 				this.isAnimationRunning = false;
 				this.curTouch = 0;
