@@ -33,6 +33,10 @@
 	function setActive(draw: drawType) {
 		data.currentDraw = draw;
 	}
+
+	function toggleHint() {
+		data.showHint = !data.showHint;
+	}
 </script>
 
 <main>
@@ -70,6 +74,30 @@
 			<img class="ctrl-icon" alt="icon" src="./icon-reset.svg" />
 			<div>Reset</div>
 		</button>
+	</div>
+	<div role="button" on:touchstart={() => toggleHint()} class="hint-button">
+		<span>🛈</span> How to use
+	</div>
+	<div
+		on:touchstart={() => toggleHint()}
+		class="hint-text"
+		style={`display:${data.showHint ? "block" : "none"}`}
+	>
+		<ul>
+			<li>
+				Use the buttons below to start selecting teeth or shades, you can draw
+				the area to be selected (as teeth or shade), or you can simply tap on it
+				and it will be automatically determined.
+			</li>
+			<li>
+				Use one finger to draw and select areas, and two fingers to zoom (pinch)
+				and pan (scroll).
+			</li>
+			<li>
+				After selecting both shades and teeth the program will define the
+				closest shade to the selected teeth
+			</li>
+		</ul>
 	</div>
 </main>
 
@@ -136,7 +164,7 @@
 		);
 		background-size: 20px 20px;
 		display: flex;
-		justify-content: center; 
+		justify-content: center;
 		align-items: center;
 	}
 	#canvas {
@@ -144,5 +172,33 @@
 		margin: 0 auto;
 		border-radius: 5px;
 		transition: transform 0.1s;
+	}
+	.hint-button {
+		span {
+			font-size: 25px;
+			position: relative;
+			top: 4px;
+			left: -1px;
+		}
+		position: fixed;
+		top: 5px;
+		left: 5px;
+		padding: 0px 13px 13px 10px;
+		background: rgba(255, 255, 255, 0.7);
+		font-family: monospace;
+		border-radius: 5px;
+		border: 1px solid #e0e0e0;
+	}
+	.hint-text {
+		position: fixed;
+		top: 64px;
+		width: 90%;
+		left: 5%;
+		background: rgba(33, 33, 33, 0.71);
+		padding: 10px 10px 13px 30px;
+		border-radius: 4px;
+		font-family: monospace;
+		color: rgb(255, 255, 255);
+		transition: top 0.5s ease 0s;
 	}
 </style>
