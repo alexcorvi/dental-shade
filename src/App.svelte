@@ -40,64 +40,66 @@
 </script>
 
 <main>
-	<div id="canvas-container">
-		<img id="image" src="test11.jpg" alt="img" />
-		<canvas id="canvas"></canvas>
-	</div>
+	<div class="selected">
+		<div id="canvas-container">
+			<img id="image" src="test11.jpg" alt="img" />
+			<canvas id="canvas"></canvas>
+		</div>
 
-	<div class="ctrl">
-		<button
-			class={(data.currentDraw === "shades" ? "selected " : "") + "ctrl-btn"}
-			on:click={() => setActive("shades")}
-		>
-			<img class="ctrl-icon" alt="icon" src="./icon-shade.svg" />
-			<div>Select Shades</div>
-		</button>
+		<div class="ctrl">
+			<button
+				class={(data.currentDraw === "shades" ? "selected " : "") + "ctrl-btn"}
+				on:click={() => setActive("shades")}
+			>
+				<img class="ctrl-icon" alt="icon" src="./icon-shade.svg" />
+				<div class="btn-text">Select Shades</div>
+			</button>
 
-		<button
-			class={(data.currentDraw === "teeth" ? "selected " : "") + "ctrl-btn"}
-			on:click={() => setActive("teeth")}
-		>
-			<img class="ctrl-icon" alt="icon" src="./icon-tooth.svg" />
-			<div>Select Teeth</div>
-		</button>
+			<button
+				class={(data.currentDraw === "teeth" ? "selected " : "") + "ctrl-btn"}
+				on:click={() => setActive("teeth")}
+			>
+				<img class="ctrl-icon" alt="icon" src="./icon-tooth.svg" />
+				<div class="btn-text">Select Teeth</div>
+			</button>
 
-		<button
-			class={"ctrl-btn"}
-			on:click={() => {
-				data.rectangles.shades = [];
-				data.rectangles.teeth = [];
-				start();
-				setActive("");
-			}}
+			<button
+				class={"ctrl-btn"}
+				on:click={() => {
+					data.rectangles.shades = [];
+					data.rectangles.teeth = [];
+					start();
+					setActive("");
+				}}
+			>
+				<img class="ctrl-icon" alt="icon" src="./icon-reset.svg" />
+				<div class="btn-text">Reset</div>
+			</button>
+		</div>
+		<div role="button" on:touchstart={() => toggleHint()} class="hint-button">
+			<span>🛈</span> How to use
+		</div>
+		<div
+			on:touchstart={() => toggleHint()}
+			class="hint-text"
+			style={`display:${data.showHint ? "block" : "none"}`}
 		>
-			<img class="ctrl-icon" alt="icon" src="./icon-reset.svg" />
-			<div>Reset</div>
-		</button>
-	</div>
-	<div role="button" on:touchstart={() => toggleHint()} class="hint-button">
-		<span>🛈</span> How to use
-	</div>
-	<div
-		on:touchstart={() => toggleHint()}
-		class="hint-text"
-		style={`display:${data.showHint ? "block" : "none"}`}
-	>
-		<ul>
-			<li>
-				Use the buttons below to start selecting teeth or shades, you can draw
-				the area to be selected (as teeth or shade), or you can simply tap on it
-				and it will be automatically determined.
-			</li>
-			<li>
-				Use one finger to draw and select areas, and two fingers to zoom (pinch)
-				and pan (scroll).
-			</li>
-			<li>
-				After selecting both shades and teeth the program will define the
-				closest shade to the selected teeth
-			</li>
-		</ul>
+			<ul>
+				<li>
+					Use the buttons below to start selecting teeth or shades, you can draw
+					the area to be selected (as teeth or shade), or you can simply tap on
+					it and it will be automatically determined.
+				</li>
+				<li>
+					Use one finger to draw and select areas, and two fingers to zoom
+					(pinch) and pan (scroll).
+				</li>
+				<li>
+					After selecting both shades and teeth the program will define the
+					closest shade to the selected teeth
+				</li>
+			</ul>
+		</div>
 	</div>
 </main>
 
@@ -115,39 +117,42 @@
 		position: fixed;
 		width: 100%;
 		bottom: -1px;
-		padding: 15px 0;
+		padding: 0;
 		z-index: 1;
+		box-shadow: 0 0 50px #0000007d;
 		.ctrl-btn {
-			display: inline-block;
-			background: #fcf8ec;
-			width: 31%;
-			padding: 5px;
+			display: inline-flex;
+			background: #ececec;
+			width: 33%;
 			text-align: center;
-			border: 1px solid #002530;
-			border-radius: 15px;
+			border: none;
 			text-transform: uppercase;
 			font-size: 12px;
 			font-family: monospace;
 			letter-spacing: 1px;
+			border-left: 1px solid #CFD8DC;
+			border-radius: 0;
+			padding: 10px 7px;
+			margin-left: -3px;
+			justify-content: space-evenly;
+			align-items: center;
 			&.selected {
-				background: #ffee58;
-				border-color: #f57f17;
-				border-width: 2px;
-			}
-			&:hover {
-				box-shadow: 1px 1px 1px #000;
+				background: #fff;
 			}
 			.ctrl-icon {
 				width: 50px;
 				height: 50px;
 				border-radius: 20px;
 			}
+			.btn-text {
+				width: 90px;
+			}
 		}
 	}
 
 	#canvas-container {
 		width: 100%;
-		height: calc(100vh - 110px);
+		height: calc(100vh - 65px);
 		overflow: hidden;
 		margin: 0 auto;
 		border-radius: 7px;
