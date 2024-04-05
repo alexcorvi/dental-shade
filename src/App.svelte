@@ -12,16 +12,12 @@
 		if (!ctx) return;
 		mouseEventsListeners(ctx, canvas, img);
 		img.onload = function () {
-			canvas.height = img.height;
-			canvas.width = img.width;
 			img.style.display = "none";
-
 			new Zoom(canvas, {
 				rotate: false,
 				pan: false,
 				minZoom: 1,
 			});
-
 			start();
 		};
 	});
@@ -78,6 +74,11 @@
 </main>
 
 <style lang="scss">
+	main {
+		overflow: hidden;
+		width: 100%;
+		height: 100vh;
+	}
 	.ctrl {
 		text-align: center;
 		margin-top: 10px;
@@ -117,14 +118,12 @@
 	}
 
 	#canvas-container {
-		width: calc(100% - 20px);
-		height: calc(100vh - 230px);
+		width: 100%;
+		height: calc(100vh - 110px);
 		overflow: hidden;
 		margin: 0 auto;
-		border: 3px solid #795548;
 		border-radius: 7px;
-		margin-top: 10px;
-		background-color: #f0f0f0; /* Light gray background */
+		background-color: #f0f0f0; // fallback
 		background-image: linear-gradient(
 			45deg,
 			transparent 25%,
@@ -136,6 +135,9 @@
 			#ccc
 		);
 		background-size: 20px 20px;
+		display: flex;
+		justify-content: center; 
+		align-items: center;
 	}
 	#canvas {
 		display: block;

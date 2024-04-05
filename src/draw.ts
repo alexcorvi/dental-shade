@@ -2,7 +2,7 @@ import { debouncedCalculation } from "./calculate";
 import { deltaE2000 } from "./comparison";
 import { hexToRGBA } from "./conversion";
 import { data } from "./data";
-import { rectangle, resizeEdgeT, coords, drawType, ColorTuple } from "./types";
+import { rectangle, resizeEdgeT, coords, ColorTuple } from "./types";
 
 let resizeEdge: resizeEdgeT = "";
 
@@ -484,6 +484,19 @@ export function drawWinner(ctx: CanvasRenderingContext2D, rect: rectangle) {
 	ctx.strokeStyle = "green"
 	ctx.strokeRect(rect.x+2, rect.y+2, rect.width-4, rect.height-4);
 }
+
+function resize(oW: number, oH: number, nW: number, nH: number) {
+	const aspectRatio = oW / oH;
+	const newAspectRatio = nW / nH;
+	if (aspectRatio === newAspectRatio) {
+		return { width: nW, height: nH };
+	}
+	if (nH > nW) {
+		const height = nW / aspectRatio;
+		return { width: nW, height };
+	}
+	const width = nH * aspectRatio;
+	return { width, height: nH };
 }
 
 // the main drawing function, draws every rectangle with its control points and delete button
@@ -493,8 +506,23 @@ export function draw(
 	canvas: HTMLCanvasElement,
 	img: HTMLImageElement
 ) {
+
+	canvas.height = img.height;
+	canvas.width = img.width;
+
 	ctx.clearRect(0, 0, canvas.width, canvas.height);
 	ctx.drawImage(img, 0, 0);
+
+	const wrapper = document.getElementById("canvas-container") as HTMLElement;
+	const newSize = resize(
+		img.width,
+		img.height,
+		wrapper.clientWidth,
+		wrapper.clientHeight,
+	);
+
+	canvas.style.height = newSize.height + "px";
+	canvas.style.width = newSize.width + "px";
 
 	// Draw red rectangles
 	ctx.strokeStyle = "red";
