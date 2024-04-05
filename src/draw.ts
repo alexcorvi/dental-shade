@@ -9,7 +9,7 @@ let resizeEdge: resizeEdgeT = "";
 // function to check if mouse is over delete button
 function isMouseOverDelete(mouseCoords: coords, rect: rectangle) {
 	let buttonX = rect.x;
-	let buttonY = rect.y + rect.height - 15;
+	let buttonY = rect.y + rect.height;
 	return (
 		mouseCoords.x >= buttonX &&
 		mouseCoords.x <= buttonX + rect.width &&
@@ -473,14 +473,17 @@ export function mouseEventsListeners(
 
 // a function to draw a mark on the winning shade
 export function drawWinner(ctx: CanvasRenderingContext2D, rect: rectangle) {
-	let buttonSize = 15;
 	let buttonX = rect.x + 1;
 	let buttonY = rect.y + 1;
-	ctx.fillStyle = "green";
-	ctx.fillRect(buttonX, buttonY, buttonSize, buttonSize);
 	ctx.fillStyle = "white";
-	ctx.font = "bold 12px Arial";
-	ctx.fillText("✓", buttonX + 4, buttonY + 12);
+	ctx.font = "bold 24px Arial";
+	ctx.fillText("✓", buttonX + 3, buttonY + 19);
+	ctx.fillStyle = "green";
+	ctx.font = "bold 20px Arial";
+	ctx.fillText("✓", buttonX + 4, buttonY + 18);
+	ctx.strokeStyle = "green"
+	ctx.strokeRect(rect.x+2, rect.y+2, rect.width-4, rect.height-4);
+}
 }
 
 // the main drawing function, draws every rectangle with its control points and delete button
@@ -517,9 +520,9 @@ export function draw(
 function drawDeleteButton(ctx: CanvasRenderingContext2D, rect: rectangle) {
 	let buttonHeight = 15;
 	let buttonX = rect.x;
-	let buttonY = rect.y + rect.height - buttonHeight;
+	let buttonY = rect.y + rect.height;
 	let c = hexToRGBA(ctx.strokeStyle as string);
-	ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},0.6)`;
+	ctx.fillStyle = `rgba(${c[0]},${c[1]},${c[2]},1)`;
 	ctx.fillRect(buttonX, buttonY, rect.width, buttonHeight);
 	ctx.fillStyle = "white";
 	ctx.font = "bold 12px monospace";
@@ -530,48 +533,35 @@ function drawDeleteButton(ctx: CanvasRenderingContext2D, rect: rectangle) {
 function drawControlPoints(ctx: CanvasRenderingContext2D, rect: rectangle) {
 	let controlSize = 6;
 	ctx.fillStyle = "black";
+	// corner left
 	ctx.fillRect(
 		rect.x - controlSize / 2,
 		rect.y - controlSize / 2,
 		controlSize,
 		controlSize
 	);
+	// middle top
 	ctx.fillRect(
 		rect.x + rect.width / 2 - controlSize / 2,
 		rect.y - controlSize / 2,
 		controlSize,
 		controlSize
 	);
+	// corner right
 	ctx.fillRect(
 		rect.x + rect.width - controlSize / 2,
 		rect.y - controlSize / 2,
 		controlSize,
 		controlSize
 	);
+	// middle right
 	ctx.fillRect(
 		rect.x + rect.width - controlSize / 2,
 		rect.y + rect.height / 2 - controlSize / 2,
 		controlSize,
 		controlSize
 	);
-	ctx.fillRect(
-		rect.x + rect.width - controlSize / 2,
-		rect.y + rect.height - controlSize / 2,
-		controlSize,
-		controlSize
-	);
-	ctx.fillRect(
-		rect.x + rect.width / 2 - controlSize / 2,
-		rect.y + rect.height - controlSize / 2,
-		controlSize,
-		controlSize
-	);
-	ctx.fillRect(
-		rect.x - controlSize / 2,
-		rect.y + rect.height - controlSize / 2,
-		controlSize,
-		controlSize
-	);
+	// middle left
 	ctx.fillRect(
 		rect.x - controlSize / 2,
 		rect.y + rect.height / 2 - controlSize / 2,
