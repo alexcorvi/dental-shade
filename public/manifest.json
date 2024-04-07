@@ -1,0 +1,39 @@
+{
+	"name": "Dental Shade",
+	"scope": "/",
+	"launch_handler": {
+		"client_mode": "auto"
+	},
+	"id": "dental-shade",
+	"short_name": "Dental Shade",
+	"start_url": "https://dentalshade.surge.sh/",
+	"display": "standalone",
+	"description": "This application simplifies shade selection for prosthodontic restoration using standard phone photos. Innovative algorithms analyze images to match shades accurately. With intuitive controls, dentists identify the perfect shade for each restoration, ensuring natural results.",
+	"lang": "en",
+	"dir": "ltr",
+	"theme_color": "#fff",
+	"background_color": "#fff",
+	"orientation": "any",
+	"icons": [
+		{
+			"src": "./icon-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "maskable"
+		},
+		{
+			"src": "./icon-192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any"
+		}
+	],
+	"file_handlers": [
+		{
+			"action": "https://dentalshade.surge.sh",
+			"accept": {
+				"image/*": [".png", ".jpg"]
+			}
+		}
+	]
+}
